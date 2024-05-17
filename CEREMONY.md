@@ -4,7 +4,7 @@
 
 ### Specification
 
-For the phase 1 contribution (a.k.a powers of tau ceremony) we are using the [Perpetual Powers of Tau ceremony](https://github.com/privacy-scaling-explorations/perpetualpowersoftau) (up to the 54th contribution) through the s3 hosted bucket in the [snarkjs repo README](https://github.com/iden3/snarkjs/blob/master/README.md#7-prepare-phase-2). We built a [deserializer](https://github.com/worldcoin/ptau-deserializer) from the `.ptau` format into the `.ph1` format used by gnark and initialized a phase 2 using a fork ([phase2-setup](https://github.com/worldcoin/phase2-setup)) of a ceremony coordinator wrapper on top of gnark built by the [zkbnb team](https://github.com/bnb-chain/zkbnb-setup).
+For the phase 1 contribution (a.k.a powers of tau ceremony) we are using the [Perpetual Powers of Tau ceremony](https://github.com/privacy-scaling-explorations/perpetualpowersoftau) (up to the 54th contribution) through the s3 hosted bucket in the [snarkjs repo README](https://github.com/iden3/snarkjs/blob/master/README.md#7-prepare-phase-2). We built a [deserializer](https://github.com/worldcoin/ptau-deserializer) from the `.ptau` format into the `.ph1` format used by gnark and initialized a phase 2 using a fork ([semaphore-phase2-setup](https://github.com/worldcoin/semaphore-phase2-setup)) of a ceremony coordinator wrapper on top of gnark built by the [zkbnb team](https://github.com/bnb-chain/zkbnb-setup).
 
 #### System used
 
@@ -19,14 +19,14 @@ For the phase 1 contribution (a.k.a powers of tau ceremony) we are using the [Pe
 The chain of comands that has been performed before the first contribution.
 
 ```bash
-git clone https://github.com/worldcoin/phase2-setup
-git clone https://github.com/worldcoin/phase2-setup
+git clone https://github.com/worldcoin/semaphore-phase2-setup
+git clone https://github.com/worldcoin/semaphore-phase2-setup
 ```
 
 Download the trusted setup ceremony coordinator tool and the powers of tau files.
 
 ```bash
-cd phase2-setup && go build -v
+cd semaphore-phase2-setup && go build -v
 
 # Download Powers of Tau files for each respective circuit
 wget https://hermez.s3-eu-west-1.amazonaws.com/powersOfTau28_hez_final_20.ptau
@@ -39,9 +39,9 @@ wget https://hermez.s3-eu-west-1.amazonaws.com/powersOfTau28_hez_final_26.ptau
 mv powersOfTau28_hez_final_26.ptau 26.ptau
 
 # Convert .ptau format into .ph1
-./phase2-setup p1i 20.ptau 20.ph1
-./phase2-setup p1i 23.ptau 23.ph1
-./phase2-setup p1i 26.ptau 26.ph1
+./semaphore-phase2-setup p1i 20.ptau 20.ph1
+./semaphore-phase2-setup p1i 23.ptau 23.ph1
+./semaphore-phase2-setup p1i 26.ptau 26.ph1
 
 # go up a folder
 cd ../
@@ -71,7 +71,7 @@ cd semaphore-mtb && go build -v
   - powers of Tau needed: 26
 
 ```bash
-cd phase2-setup && go build -v
+cd semaphore-phase2-setup && go build -v
 >>>>>>> master
 
 # requires quite a bit of compute
@@ -80,7 +80,7 @@ cd phase2-setup && go build -v
 ./gnark-mbu r1cs --batch-size 1000 --tree-depth 30 --output b1000t30.r1cs
 
 # move the r1cs files into the coordinator folder
-mv b10t30.r1cs b100t30.r1cs b1000t30.r1cs ../phase2-setup/
+mv b10t30.r1cs b100t30.r1cs b1000t30.r1cs ../semaphore-phase2-setup/
 
 # go up a folder
 cd ../
@@ -92,18 +92,18 @@ Initialize the phase 2 of the setup (the slowest process):
 # make folders for each phase 2
 mkdir b10 b100 b1000
 
-cd phase2-setup
+cd semaphore-phase2-setup
 
 # initialize each respective phase2
-./phase2-setup p2n 20.ph1 b10t30.r1cs b10t30c0.ph2
+./semaphore-phase2-setup p2n 20.ph1 b10t30.r1cs b10t30c0.ph2
 
 mv b10t30c0.ph2 srs.lag evals ../b10/
 
-./phase2-setup p2n 23.ph1 b100t30.r1cs b100t30c0.ph2
+./semaphore-phase2-setup p2n 23.ph1 b100t30.r1cs b100t30c0.ph2
 
 mv b100t30c0.ph2 srs.lag evals ../b100/
 
-./phase2-setup p2n 26.ph1 b1000t30.r1cs b1000t30c0.ph2
+./semaphore-phase2-setup p2n 26.ph1 b1000t30.r1cs b1000t30c0.ph2
 
 mv b1000t30c0.ph2 srs.lag evals ../b1000/
 ```
@@ -181,26 +181,26 @@ Perform the contribution for each individual .ph2 file and increase the XX count
 You will also receive pre-signed URLs to upload your contribution to the S3 bucket, after your contributions are done and you have the output files, upload them using the following commands:
 
 =======
-Download and build the [`phase2-setup`](https://github.com/worldcoin/phase2-setup) coordinator tool to perform the contribution:
+Download and build the [`semaphore-phase2-setup`](https://github.com/worldcoin/semaphore-phase2-setup) coordinator tool to perform the contribution:
 
 ```
-git clone https://github.com/worldcoin/phase2-setup
-cd phase2-setup
+git clone https://github.com/worldcoin/semaphore-phase2-setup
+cd semaphore-phase2-setup
 go build -v
 ```
 
 Perform the contribution for each individual .ph2 file and increase the XX counter by one. Each command will output a contribution hash, please copy each of these down into a file of the format `<NAME/PSEUDONYM>_CONTRIBUTION.txt` and prepend each value with the corresponding batch size of the .ph2 file you contributed to (b10, b100 or b1000). Please also share via a message what NAME or PSEUDONYM you selected since it is required to generate a pre-signed S3 upload URL.
 
 ```
-./phase2-setup p2c b10t30cXX.ph2 b10t30c(XX + 1).ph2
+./semaphore-phase2-setup p2c b10t30cXX.ph2 b10t30c(XX + 1).ph2
 ```
 
 ```
-./phase2-setup p2c b100t30cXX.ph2 b100t30c(XX + 1).ph2
+./semaphore-phase2-setup p2c b100t30cXX.ph2 b100t30c(XX + 1).ph2
 ```
 
 ```
-./phase2-setup p2c b100t30cXX.ph2 b100t30c(XX + 1).ph2
+./semaphore-phase2-setup p2c b100t30cXX.ph2 b100t30c(XX + 1).ph2
 ```
 
 You will also receive pre-signed URLs to upload your contribution to the S3 bucket, after your contributions are done and you have the output files, upload them using the following commands:

@@ -4,7 +4,7 @@ This tool allows users to run an MPC ceremony for generating the proving and ver
 
 ## Semaphore Merkle Tree Batcher (SMTB)
 
-[SMTB](http://github.com/worldcoin/phase2-setup/) is a service for batch processing of Merkle tree updates. It is designed to be used in conjunction with the [World ID contracts](https://github.com/worldcoin/world-id-contracts) which use [Semaphore](https://github.com/semaphore-protocol/semaphore) as a dependency. It accepts Merkle tree updates and batches them together into a single one. This is useful for reducing the number of transactions that need to be submitted to the blockchain. The correctness of the batched Merkle tree update is assured through the generation of a SNARK (generated through [gnark](https://github.com/ConsenSys/gnark)).
+[SMTB](http://github.com/worldcoin/semaphore-phase2-setup/) is a service for batch processing of Merkle tree updates. It is designed to be used in conjunction with the [World ID contracts](https://github.com/worldcoin/world-id-contracts) which use [Semaphore](https://github.com/semaphore-protocol/semaphore) as a dependency. It accepts Merkle tree updates and batches them together into a single one. This is useful for reducing the number of transactions that need to be submitted to the blockchain. The correctness of the batched Merkle tree update is assured through the generation of a SNARK (generated through [gnark](https://github.com/ConsenSys/gnark)).
 
 ## Reasoning behind a custom trusted setup
 
@@ -30,7 +30,7 @@ Remember that you need sufficiently high powers of tau ceremony to generate a pr
 
 ### Initialization
 
-`phase2-setup p2n <downloaded_ptau_file.ptau> <circuit.r1cs> <initialPhase2Contribution.ph2>`
+`semaphore-phase2-setup p2n <downloaded_ptau_file.ptau> <circuit.r1cs> <initialPhase2Contribution.ph2>`
 
 ### Contribution
 
@@ -38,17 +38,17 @@ This process is similar to phase 1, except we use commands `p2c` and `p2v`
 This is a sequential process that will be repeated for each contributor.
 
 1. The coordinator sends the latest `*.ph2` file to the current contributor
-2. The contributor runs the command `phase2-setup p2c <input.ph2> <output.ph2>`.
+2. The contributor runs the command `semaphore-phase2-setup p2c <input.ph2> <output.ph2>`.
 3. Upon successful contribution, the program will output **contribution hash** which must be attested to
 4. The contributor sends the output file back to the coordinator
-5. The coordinator verifies the file by running `phase2-setup p2v <output.ph2> <initialPhase2Contribution.ph2>`.
+5. The coordinator verifies the file by running `semaphore-phase2-setup p2v <output.ph2> <initialPhase2Contribution.ph2>`.
 6. Upon successful verification, the coordinator asks the contributor to attest to their contribution.
 
-**Security Note** It is important for the coordinator to keep track of the contribution hashes output by `phase2-setup p2v` to determine whether the user has maliciously replaced previous contributions or re-initiated one on its own
+**Security Note** It is important for the coordinator to keep track of the contribution hashes output by `semaphore-phase2-setup p2v` to determine whether the user has maliciously replaced previous contributions or re-initiated one on its own
 
 ## Keys Extraction
 
-At the end of the ceremony, the coordinator runs `phase2-setup key <lastPhase2Contribution.ph2>` which will output **Groth16 bn254 curve** `pk` and `vk` files
+At the end of the ceremony, the coordinator runs `semaphore-phase2-setup key <lastPhase2Contribution.ph2>` which will output **Groth16 bn254 curve** `pk` and `vk` files
 
 ## Acknowledgements
 

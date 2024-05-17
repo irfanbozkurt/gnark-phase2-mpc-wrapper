@@ -34,5 +34,5 @@ for ARCH in darwin_amd64 darwin_arm64 linux_386 linux_arm64 linux_arm; do
   esac
 
   echo "Building for $ARCH..."
-  go build -ldflags="-w -s" -o phase2-setup-$ARCH
+  go build -ldflags="-w -s" -o semaphore-phase2-setup-$ARCH
 done
