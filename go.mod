@@ -1,4 +1,4 @@
-module github.com/worldcoin/semaphore-mtb
+module github.com/worldcoin/phase2-setup
 
 go 1.21
 
