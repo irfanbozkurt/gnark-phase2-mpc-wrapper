@@ -28,7 +28,7 @@ Download the Powers of Tau () (`.ptau`) file you need corresponding to the amoun
 
 Remember that you need sufficiently high powers of tau ceremony to generate a proof for a circuit with a given amount of constraints ($2^{POW_OF_TAU} >= CIRCUIT_CONSTRAINTS$):
 
-Import phase 1 by deserializing a .ptau file: `semaphore-mtb-setup p1i <ceremony.ptau> <lastPhase1Contribution.ph1>`.
+Import phase 1 by deserializing a .ptau file: `semaphore-mtb p1i <ceremony.ptau> <lastPhase1Contribution.ph1>`.
 
 To get a sample r1cs file from `semaphore-mtb`, checkout the [`semaphore-mtb` repository](https://github.com/worldcoin/semaphore-mtb.git) and run the following command:
 
@@ -41,18 +41,18 @@ go build
 cd ..
 ```
 
-Move the file into the `semaphore-mtb-setup` directory:
+Move the file into the `semaphore-mtb` directory:
 
 ```bash
-mv ./semaphore-mtb/demo_smtb.r1cs ./semaphore-mtb-setup/smtb.r1cs
+mv ./semaphore-mtb/demo_smtb.r1cs ./semaphore-mtb/smtb.r1cs
 ```
 
 ### Initialization
 
 Depending on the R1CS file, the coordinator runs one of the following commands:
 
-1. Regular R1CS: `semaphore-mtb-setup p2n <lastPhase1Contribution.ph1> <r1cs> <initialPhase2Contribution.ph2>`.
-2. Parted R1CS: `semaphore-mtb-setup p2np <phase1Path> <r1csPath> <outputPhase2> <#constraints> <#nbR1C> <batchSize>`
+1. Regular R1CS: `semaphore-mtb p2n <lastPhase1Contribution.ph1> <r1cs> <initialPhase2Contribution.ph2>`.
+2. Parted R1CS: `semaphore-mtb p2np <phase1Path> <r1csPath> <outputPhase2> <#constraints> <#nbR1C> <batchSize>`
 
 ### Contribution
 
@@ -60,17 +60,17 @@ This process is similar to phase 1, except we use commands `p2c` and `p2v`
 This is a sequential process that will be repeated for each contributor.
 
 1. The coordinator sends the latest `*.ph2` file to the current contributor
-2. The contributor runs the command `semaphore-mtb-setup p2c <input.ph2> <output.ph2>`.
+2. The contributor runs the command `semaphore-mtb p2c <input.ph2> <output.ph2>`.
 3. Upon successful contribution, the program will output **contribution hash** which must be attested to
 4. The contributor sends the output file back to the coordinator
-5. The coordinator verifies the file by running `semaphore-mtb-setup p2v <output.ph2> <initialPhase2Contribution.ph2>`.
+5. The coordinator verifies the file by running `semaphore-mtb p2v <output.ph2> <initialPhase2Contribution.ph2>`.
 6. Upon successful verification, the coordinator asks the contributor to attest to their contribution.
 
-**Security Note** It is important for the coordinator to keep track of the contribution hashes output by `semaphore-mtb-setup p2v` to determine whether the user has maliciously replaced previous contributions or re-initiated one on its own
+**Security Note** It is important for the coordinator to keep track of the contribution hashes output by `semaphore-mtb p2v` to determine whether the user has maliciously replaced previous contributions or re-initiated one on its own
 
 ## Keys Extraction
 
-At the end of the ceremony, the coordinator runs `semaphore-mtb-setup key <lastPhase2Contribution.ph2>` which will output **Groth16 bn254 curve** `pk` and `vk` files
+At the end of the ceremony, the coordinator runs `semaphore-mtb key <lastPhase2Contribution.ph2>` which will output **Groth16 bn254 curve** `pk` and `vk` files
 
 ## Phase 1 (Powers of Tau)
 
@@ -88,20 +88,20 @@ This process will be skipped for the actual ceremony as we will be using the uni
 
 **Note** Values between `<>` are arguments replaced by actual values during the setup
 
-1. Coordinator run the command `semaphore-mtb-setup p1n <p> <output.ph1>`.
+1. Coordinator run the command `semaphore-mtb p1n <p> <output.ph1>`.
 
 ### Contribution
 
 This is a sequential process that will be repeated for each contributor.
 
 1. The coordinator sends the latest `*.ph1` file to the current contributor
-2. The contributor runs the command `semaphore-mtb-setup p1c <input.ph1> <output.ph1>`.
+2. The contributor runs the command `semaphore-mtb p1c <input.ph1> <output.ph1>`.
 3. Upon successful contribution, the program will output **contribution hash** which must be attested to
 4. The contributor sends the output file back to the coordinator
-5. The coordinator verifies the file by running `semaphore-mtb-setup p1v <output.ph1>`.
+5. The coordinator verifies the file by running `semaphore-mtb p1v <output.ph1>`.
 6. Upon successful verification, the coordinator asks the contributor to attest to their contribution.
 
-**Security Note** It is important for the coordinator to keep track of the contribution hashes output by `semaphore-mtb-setup p1v` to determine whether the user has maliciously replaced previous contributions or re-initiated one on its own
+**Security Note** It is important for the coordinator to keep track of the contribution hashes output by `semaphore-mtb p1v` to determine whether the user has maliciously replaced previous contributions or re-initiated one on its own
 
 ## Acknowledgements
 
