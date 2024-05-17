@@ -99,6 +99,8 @@ func p2c(cCtx *cli.Context) error {
 	}
 	phase2.WriteTo(outputFile)
 
+	fmt.Println("Contribution done successfully. Written to " + outputPath)
+
 	return nil
 }
 
@@ -125,6 +127,8 @@ func p2v(cCtx *cli.Context) error {
 	origin.ReadFrom(originFile)
 
 	mpcsetup.VerifyPhase2(origin, input)
+
+	fmt.Println("Phase 2 contributions verified successfully")
 
 	return nil
 }

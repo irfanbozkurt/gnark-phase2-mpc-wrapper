@@ -52,6 +52,6 @@ At the end of the ceremony, the coordinator runs `phase2-setup key <lastPhase2Co
 
 ## Acknowledgements
 
-This repository is a fork of the [phase2-setup-setup](https://github.com/worldcoin/phase2-setup-setup/) repository. We would like to thank the authors of the original repository for their work as this project is a slight tweak of the original work to fit our needs.
+This repository is a fork of the [semaphore-mtb](https://github.com/worldcoin/semaphore-mtb) repository. We would like to thank the authors of the original repository for their work as this project is a slight tweak of the original work to fit our needs.
 
 We appreciate the community efforts to generate [a good universal SRS](https://github.com/privacy-scaling-explorations/perpetualpowersoftau) for everyone's benefit to use and for the [iden3 team for building [snarkjs](https://github.com/iden3/snarkjs).
