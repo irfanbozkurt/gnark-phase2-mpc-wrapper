@@ -175,6 +175,8 @@ func extractKeys(cCtx *cli.Context) error {
 	}
 	evals.ReadFrom(evalsFile)
 
+	fmt.Println("len(evals.G1.VKK)", len(evals.G1.VKK))
+
 	r1csPath := cCtx.Args().Get(3)
 	r1cs := &cs.R1CS{}
 	r1csFile, err := os.Open(r1csPath)
