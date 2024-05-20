@@ -19,13 +19,6 @@ func readPtauFileAsPh1(ptauFilePath string) (*mpcsetup.Phase1, error) {
 		return nil, err
 	}
 
-	fmt.Printf("len(ptau.PTauPubKey.TauG1): %d\n", len(ptau.PTauPubKey.TauG1))
-	fmt.Printf("len(ptau.PTauPubKey.AlphaTauG1): %d\n", len(ptau.PTauPubKey.AlphaTauG1))
-	fmt.Printf("len(ptau.PTauPubKey.BetaTauG1): %d\n", len(ptau.PTauPubKey.BetaTauG1))
-
-	fmt.Printf("len(ptau.PTauPubKey.TauG2): %d\n", len(ptau.PTauPubKey.TauG2))
-	fmt.Printf("len(ptau.PTauPubKey.BetaG2): %v\n", ptau.PTauPubKey.BetaG2)
-
 	fmt.Fprintln(os.Stdout, []any{"\n################# Converting ptau file into a phase1 object...\n"}...)
 	_phase1, err := deserializer.ConvertPtauToPhase1(ptau)
 	if err != nil {
@@ -68,21 +61,30 @@ func p2n(cCtx *cli.Context) error {
 
 	fmt.Fprintln(os.Stdout, []any{"\n################# Initializing phase2\n"}...)
 	phase2, phase2Evaluations := mpcsetup.InitPhase2(r1cs, phase1)
-	fmt.Println("phase2.Hash: ", phase2.Hash)
 
 	fmt.Println("\n################# Writing to file: " + phase2Path)
 	phase2File, err := os.Create(phase2Path)
 	if err != nil {
 		return err
 	}
-	phase2.WriteTo(phase2File)
+	defer phase2File.Close()
+	if _, err = phase2.WriteTo(phase2File); err != nil {
+		fmt.Println("Error writing to file:", err)
+		return err
+	}
+	phase2File.Close()
 
 	fmt.Println("\n################# Writing to file: " + phase2EvaluationsPath)
 	phase2EvaluationsFile, err := os.Create(phase2EvaluationsPath)
 	if err != nil {
 		return err
 	}
-	phase2Evaluations.WriteTo(phase2EvaluationsFile)
+	defer phase2EvaluationsFile.Close()
+	if _, err := phase2Evaluations.WriteTo(phase2EvaluationsFile); err != nil {
+		fmt.Println("Error writing to file:", err)
+		return err
+	}
+	phase2EvaluationsFile.Close()
 
 	return nil
 }
@@ -168,7 +170,7 @@ func extractKeys(cCtx *cli.Context) error {
 	phase2.ReadFrom(phase2File)
 
 	evalsPath := cCtx.Args().Get(2)
-	evals := &mpcsetup.Phase2Evaluations{}
+	evals := mpcsetup.Phase2Evaluations{}
 	evalsFile, err := os.Open(evalsPath)
 	if err != nil {
 		return err
@@ -185,7 +187,8 @@ func extractKeys(cCtx *cli.Context) error {
 	}
 	r1cs.ReadFrom(r1csFile)
 
-	pk, vk := mpcsetup.ExtractKeys(phase1, phase2, evals, r1cs.NbConstraints)
+	pk, vk := mpcsetup.ExtractKeys(phase1, phase2, &evals, r1cs.NbConstraints)
+	fmt.Println("len(vk.G1.K)", len(vk.G1.K))
 
 	pkFile, err := os.Create("pk")
 	if err != nil {
