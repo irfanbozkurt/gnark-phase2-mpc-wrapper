@@ -12,19 +12,11 @@ import (
 	deserializer "github.com/worldcoin/ptau-deserializer/deserialize"
 )
 
-func p2n(cCtx *cli.Context) error {
-	if cCtx.Args().Len() != 3 {
-		return errors.New("please provide the correct arguments")
-	}
-
-	ptauFilePath := cCtx.Args().Get(0)
-	r1csPath := cCtx.Args().Get(1)
-	phase2Path := cCtx.Args().Get(2)
-
+func readPtauFileAsPh1(ptauFilePath string) (*mpcsetup.Phase1, error) {
 	fmt.Fprintln(os.Stdout, []any{"\n################# Reading ptau file...\n"}...)
 	ptau, err := deserializer.ReadPtau(ptauFilePath)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	fmt.Printf("len(ptau.PTauPubKey.TauG1): %d\n", len(ptau.PTauPubKey.TauG1))
@@ -37,8 +29,9 @@ func p2n(cCtx *cli.Context) error {
 	fmt.Fprintln(os.Stdout, []any{"\n################# Converting ptau file into a phase1 object...\n"}...)
 	_phase1, err := deserializer.ConvertPtauToPhase1(ptau)
 	if err != nil {
-		return err
+		return nil, err
 	}
+
 	phase1 := &mpcsetup.Phase1{}
 
 	phase1.Parameters.G1.Tau = _phase1.GetTauG1()
@@ -47,12 +40,23 @@ func p2n(cCtx *cli.Context) error {
 	phase1.Parameters.G2.Tau = _phase1.GetTauG2()
 	phase1.Parameters.G2.Beta = _phase1.GetBetaG2()
 
-	fmt.Printf("len(phase1.Parameters.G1.Tau): %d\n", len(phase1.Parameters.G1.Tau))
-	fmt.Printf("len(phase1.Parameters.G1.AlphaTau): %d\n", len(phase1.Parameters.G1.AlphaTau))
-	fmt.Printf("len(phase1.Parameters.G1.BetaTau): %d\n", len(phase1.Parameters.G1.BetaTau))
+	return phase1, nil
+}
 
-	fmt.Printf("len(phase1.Parameters.G2.Tau): %d\n", len(phase1.Parameters.G2.Tau))
-	fmt.Printf("len(phase1.Parameters.G2.Beta): %v\n", phase1.Parameters.G2.Beta)
+func p2n(cCtx *cli.Context) error {
+	if cCtx.Args().Len() != 3 {
+		return errors.New("please provide the correct arguments")
+	}
+
+	ptauFilePath := cCtx.Args().Get(0)
+	r1csPath := cCtx.Args().Get(1)
+	phase2Path := cCtx.Args().Get(2)
+	phase2EvaluationsPath := "phase2Evaluations"
+
+	phase1, err := readPtauFileAsPh1(ptauFilePath)
+	if err != nil {
+		return err
+	}
 
 	fmt.Fprintln(os.Stdout, []any{"\n################# Reading the r1cs file...\n"}...)
 	r1csFile, err := os.Open(r1csPath)
@@ -63,7 +67,7 @@ func p2n(cCtx *cli.Context) error {
 	r1cs.ReadFrom(r1csFile)
 
 	fmt.Fprintln(os.Stdout, []any{"\n################# Initializing phase2\n"}...)
-	phase2, _ := mpcsetup.InitPhase2(r1cs, phase1)
+	phase2, phase2Evaluations := mpcsetup.InitPhase2(r1cs, phase1)
 	fmt.Println("phase2.Hash: ", phase2.Hash)
 
 	fmt.Println("\n################# Writing to file: " + phase2Path)
@@ -72,6 +76,13 @@ func p2n(cCtx *cli.Context) error {
 		return err
 	}
 	phase2.WriteTo(phase2File)
+
+	fmt.Println("\n################# Writing to file: " + phase2EvaluationsPath)
+	phase2EvaluationsFile, err := os.Create(phase2EvaluationsPath)
+	if err != nil {
+		return err
+	}
+	phase2Evaluations.WriteTo(phase2EvaluationsFile)
 
 	return nil
 }
@@ -126,7 +137,10 @@ func p2v(cCtx *cli.Context) error {
 	origin := &mpcsetup.Phase2{}
 	origin.ReadFrom(originFile)
 
-	mpcsetup.VerifyPhase2(origin, input)
+	err = mpcsetup.VerifyPhase2(origin, input)
+	if err != nil {
+		return err
+	}
 
 	fmt.Println("Phase 2 contributions verified successfully")
 
@@ -139,13 +153,11 @@ func extractKeys(cCtx *cli.Context) error {
 		return errors.New("please provide the correct arguments")
 	}
 
-	phase1Path := cCtx.Args().Get(0)
-	phase1 := &mpcsetup.Phase1{}
-	phase1File, err := os.Open(phase1Path)
+	ptauPath := cCtx.Args().Get(0)
+	phase1, err := readPtauFileAsPh1(ptauPath)
 	if err != nil {
 		return err
 	}
-	phase1.ReadFrom(phase1File)
 
 	phase2Path := cCtx.Args().Get(1)
 	phase2 := &mpcsetup.Phase2{}
