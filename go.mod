@@ -5,13 +5,15 @@ go 1.21
 toolchain go1.22.1
 
 require (
-	github.com/consensys/gnark v0.9.2-0.20240124123439-9627e98d814f
+	github.com/consensys/gnark v0.10.0
 	github.com/consensys/gnark-crypto v0.12.2-0.20240215234832-d72fcb379d3e // indirect
 	github.com/stretchr/testify v1.8.4 // indirect
 	github.com/urfave/cli/v2 v2.25.7
 )
 
-require github.com/worldcoin/ptau-deserializer v0.1.4
+// replace github.com/dcbuild3r/ptau-deserializer => github.com/irfanbozkurt/ptau-deserializer v0.1.0
+
+require github.com/irfanbozkurt/ptau-deserializer v0.1.1-0.20240521140739-1847fdaad25e
 
 require (
 	github.com/bits-and-blooms/bitset v1.8.0 // indirect

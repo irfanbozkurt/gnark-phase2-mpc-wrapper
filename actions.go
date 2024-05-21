@@ -8,8 +8,8 @@ import (
 	groth16 "github.com/consensys/gnark/backend/groth16/bn254"
 	"github.com/consensys/gnark/backend/groth16/bn254/mpcsetup"
 	cs "github.com/consensys/gnark/constraint/bn254"
+	deserializer "github.com/irfanbozkurt/ptau-deserializer/deserialize"
 	"github.com/urfave/cli/v2"
-	deserializer "github.com/worldcoin/ptau-deserializer/deserialize"
 )
 
 func readPtauFileAsPh1(ptauFilePath string) (*mpcsetup.Phase1, error) {
@@ -28,11 +28,11 @@ func readPtauFileAsPh1(ptauFilePath string) (*mpcsetup.Phase1, error) {
 	phase1 := &mpcsetup.Phase1{}
 
 	// Implement the getters for Phase1 from ptau-deserializer
-	phase1.Parameters.G1.Tau = _phase1.GetTauG1()
-	phase1.Parameters.G1.AlphaTau = _phase1.GetAlphaTauG1()
-	phase1.Parameters.G1.BetaTau = _phase1.GetBetaTauG1()
-	phase1.Parameters.G2.Tau = _phase1.GetTauG2()
-	phase1.Parameters.G2.Beta = _phase1.GetBetaG2()
+	phase1.Parameters.G1.Tau = _phase1.TauG1()
+	phase1.Parameters.G1.AlphaTau = _phase1.AlphaTauG1()
+	phase1.Parameters.G1.BetaTau = _phase1.BetaTauG1()
+	phase1.Parameters.G2.Tau = _phase1.TauG2()
+	phase1.Parameters.G2.Beta = _phase1.BetaG2()
 
 	return phase1, nil
 }
