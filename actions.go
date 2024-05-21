@@ -27,6 +27,7 @@ func readPtauFileAsPh1(ptauFilePath string) (*mpcsetup.Phase1, error) {
 
 	phase1 := &mpcsetup.Phase1{}
 
+	// Implement the getters for Phase1 from ptau-deserializer
 	phase1.Parameters.G1.Tau = _phase1.GetTauG1()
 	phase1.Parameters.G1.AlphaTau = _phase1.GetAlphaTauG1()
 	phase1.Parameters.G1.BetaTau = _phase1.GetBetaTauG1()
