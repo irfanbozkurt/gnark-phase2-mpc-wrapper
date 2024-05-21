@@ -5,9 +5,9 @@ if [ -z "$1" ]; then
     exit 1
 fi
 
-ph2_input_file="$1"
-if [ ! -f "$ph2_input_file" ]; then
-    echo "Error: The file '$ph2_input_file' does not exist"
+to_be_verified="$1"
+if [ ! -f "$to_be_verified" ]; then
+    echo "Error: The file '$to_be_verified' does not exist"
     exit 1
 fi
 
@@ -23,13 +23,13 @@ if [ ! -f "setup" ]; then
 fi
 
 if [ -n "$2" ]; then
-    output_file="$2"
+    output_of_prev_contribution="$2"
 else
-    output_file="output_0.ph2"
+    output_of_prev_contribution="output_0.ph2"
 fi
 
 echo "Verifying given contribution"
-./setup p2v $ph2_input_file $output_file
+./setup p2v $to_be_verified $output_of_prev_contribution
 echo ""
 
 rm setup

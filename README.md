@@ -1,50 +1,65 @@
-# Guide to the Semaphore Merkle Tree Batcher MPC Contribution Ceremony
-
-This tool allows users to run an MPC ceremony for generating the proving and verifying keys for the Groth16 protocol as presented in [BGM17](https://eprint.iacr.org/2017/1050.pdf). It does not include the beacon contribution since it was proved in [KMSV21](https://eprint.iacr.org/2021/219.pdf) that the security of the generated SRS still holds without it.
-
-## Semaphore Merkle Tree Batcher (SMTB)
-
-[SMTB](http://github.com/worldcoin/semaphore-phase2-setup/) is a service for batch processing of Merkle tree updates. It is designed to be used in conjunction with the [World ID contracts](https://github.com/worldcoin/world-id-contracts) which use [Semaphore](https://github.com/semaphore-protocol/semaphore) as a dependency. It accepts Merkle tree updates and batches them together into a single one. This is useful for reducing the number of transactions that need to be submitted to the blockchain. The correctness of the batched Merkle tree update is assured through the generation of a SNARK (generated through [gnark](https://github.com/ConsenSys/gnark)).
+This tool allows Gnark 0.9.2 users to run a 2nd-phase MPC ceremony for generating the proving and verifying keys for the Groth16 protocol as presented in [BGM17](https://eprint.iacr.org/2017/1050.pdf). It does not include the beacon contribution since it was proved in [KMSV21](https://eprint.iacr.org/2021/219.pdf) that the security of the generated SRS still holds without it.
 
 ## Reasoning behind a custom trusted setup
 
-Each groth16 proof of a circuit requires a trusted setup that has 2 parts: a phase 1 which is also known as a "Powers of Tau ceremony" which is universal (the same one can be used for any circuit) and a phase2 which is circuit-specific, meaning that you need to a separate phase2 for every single circuit. In order to create an SRS to generate verifying keys for SMTB we would like many different members from different organizations to participate in the phase 2 of the trusted setup.
+Each groth16 proof of a circuit requires a trusted setup that has 2 parts: a phase 1 which is also known as a "Powers of Tau ceremony" which is universal (the same one can be used for any circuit) and a phase2 which is circuit-specific, meaning that you need to a separate phase2 for every single circuit.
 
-For the phase 1 we will be reusing the setup done by the joint effort of many community members, it is a powers of tau ceremony with 54 different contributions ([more info here](https://github.com/privacy-scaling-explorations/perpetualpowersoftau)). A list of downloadable `.ptau` files can be found [here](https://github.com/iden3/snarkjs/blob/master/README.md#7-prepare-phase-2).
+For phase 1, you can reuse the setup done by the joint effort of many community members - it is a powers of tau ceremony with 54 different contributions ([more info here](https://github.com/privacy-scaling-explorations/perpetualpowersoftau)). A list of downloadable `.ptau` files can be found [here](https://github.com/iden3/snarkjs/blob/master/README.md#7-prepare-phase-2).
+
+## Notice
+
+Phase 2 is circuit-specific, so if you have `n` circuits, then you need to run this phase `n` times.
+
+Remember that you need sufficiently high powers of tau ceremony to generate a proof for a circuit with a given amount of constraints ($2^{POW_OF_TAU} >= CIRCUIT_CONSTRAINTS$)
 
 ## Pre-requisites
 
-1. Install git https://github.com/git-guides/install-git
-2. Install Go https://go.dev/doc/install
+1. Git
+2. Go
 3. Minimum RAM requirement is 16GB
 
-## Phase 2
+# Usage
 
-This phase is circuit-specific, so if you have `n` circuits, then you need to run this phase `n` times.
+1. Initialize phase2
 
-### snarkjs Powers of Tau deserialization
+After exporting your circuit as in gnark's r1cs format, place it in the same directory as [init_phase2.sh](./bash/init_phase2.sh). Then:
 
-Download the Powers of Tau () (`.ptau`) file you need corresponding to the amount of constraints in your circuit from the [`snarkjs` repository](https://github.com/iden3/snarkjs#7-prepare-phase-2).
+```bash
+$ chmod 777 init_phase2.sh
+$ ./init_phase2.sh <powerOfTau>
+```
 
-Remember that you need sufficiently high powers of tau ceremony to generate a proof for a circuit with a given amount of constraints ($2^{POW_OF_TAU} >= CIRCUIT_CONSTRAINTS$):
+Where 'powerOfTau' is the smallest power of 2 covering your number of constraints.
+This will download corresponding ptau file, initialize phase2 ceremony, and perform 2 contributions.
 
-### Initialization
+Output of this step will be a 'output_2.ph2' file, and a 'phase2Evaluations' file. Output will be used by the next contributor to perform their contribution, and 'phase2Evaluations' will be used in the end when extracting vkey and pkey.
 
-`semaphore-phase2-setup p2n <downloaded_ptau_file.ptau> <circuit.r1cs> <initialPhase2Contribution.ph2>`
+2. Contributions
 
-### Contribution
+Contributors will use the output of the last contribution to perform their own:
 
-This process is similar to phase 1, except we use commands `p2c` and `p2v`
-This is a sequential process that will be repeated for each contributor.
+```bash
+$ chmod 777 contribute.sh
+$ ./contribute.sh <outputOfPrevContribution> <outputFileName>
+```
 
-1. The coordinator sends the latest `*.ph2` file to the current contributor
-2. The contributor runs the command `semaphore-phase2-setup p2c <input.ph2> <output.ph2>`.
-3. Upon successful contribution, the program will output **contribution hash** which must be attested to
-4. The contributor sends the output file back to the coordinator
-5. The coordinator verifies the file by running `semaphore-phase2-setup p2v <output.ph2> <initialPhase2Contribution.ph2>`.
-6. Upon successful verification, the coordinator asks the contributor to attest to their contribution.
+3. Contribution verification
 
-**Security Note** It is important for the coordinator to keep track of the contribution hashes output by `semaphore-phase2-setup p2v` to determine whether the user has maliciously replaced previous contributions or re-initiated one on its own
+The coordinator needs to verify every contribution (w.r.t. previous contribution)
+
+```bash
+$ chmod 777 verify.sh
+$ ./verify.sh <outputOfContributionToBeVerified> <outputOfPrevContribution>
+```
+
+4. Extracting the keys
+
+After repeating steps 2 and 3 as much as necessary, anyone can extract pkey and vkey containing randomness created by a group of people. These keys finalize the trusted setup and they're intended to be used in production.
+
+```bash
+$ chmod 777 extract_keys.sh
+$ ./extract_keys.sh <ptau_file> <latest_contribution> <phase2Evaluations> <r1cs>
+```
 
 ## Keys Extraction
 
