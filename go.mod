@@ -11,8 +11,6 @@ require (
 	github.com/urfave/cli/v2 v2.25.7
 )
 
-// replace github.com/dcbuild3r/ptau-deserializer => github.com/irfanbozkurt/ptau-deserializer v0.1.0
-
 require github.com/irfanbozkurt/ptau-deserializer v0.1.1-0.20240521140739-1847fdaad25e
 
 require (
