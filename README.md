@@ -1,4 +1,4 @@
-This tool is a wrapper around Gnark to perform a 2nd-phase MPC ceremony for generating the proving and verifying keys for the Groth16 protocol as presented in [BGM17](https://eprint.iacr.org/2017/1050.pdf). It does not include the beacon contribution since it was proved in [KMSV21](https://eprint.iacr.org/2021/219.pdf) that the security of the generated SRS still holds without it.
+This tool is a wrapper around Gnark for BN254 to perform a 2nd-phase MPC ceremony for generating the proving and verifying keys for Groth16 protocol as presented in [BGM17](https://eprint.iacr.org/2017/1050.pdf). It does not include the beacon contribution since it was proved in [KMSV21](https://eprint.iacr.org/2021/219.pdf) that the security of the generated SRS still holds without it.
 
 ## Pre-requisites
 
