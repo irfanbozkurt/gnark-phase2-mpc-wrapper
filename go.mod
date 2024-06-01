@@ -1,4 +1,4 @@
-module github.com/worldcoin/semaphore-phase2-setup
+module github.com/irfanbozkurt/gnark-phase2-wrapper
 
 go 1.21
 
@@ -9,11 +9,7 @@ require (
 	github.com/consensys/gnark-crypto v0.12.2-0.20240215234832-d72fcb379d3e // indirect
 	github.com/stretchr/testify v1.8.4 // indirect
 	github.com/urfave/cli/v2 v2.25.7
-)
-
-require github.com/irfanbozkurt/ptau-deserializer v0.1.1-0.20240521140739-1847fdaad25e
-
-require (
+	github.com/irfanbozkurt/ptau-deserializer v0.1.1-0.20240521140739-1847fdaad25e
 	github.com/bits-and-blooms/bitset v1.8.0 // indirect
 	github.com/blang/semver/v4 v4.0.0 // indirect
 	github.com/consensys/bavard v0.1.13 // indirect
