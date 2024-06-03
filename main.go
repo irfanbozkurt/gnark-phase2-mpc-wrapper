@@ -35,6 +35,12 @@ func readPtauFileAsPh1(ptauFilePath string) (*mpcsetup.Phase1, error) {
 	phase1.Parameters.G2.Tau = _phase1.TauG2()
 	phase1.Parameters.G2.Beta = _phase1.BetaG2()
 
+	fmt.Println("len(phase1.Parameters.G1.Tau)", len(phase1.Parameters.G1.Tau))
+	fmt.Println("len(phase1.Parameters.G1.AlphaTau)", len(phase1.Parameters.G1.AlphaTau))
+	fmt.Println("len(phase1.Parameters.G1.BetaTau)", len(phase1.Parameters.G1.BetaTau))
+	fmt.Println("len(phase1.Parameters.G2.Tau)", len(phase1.Parameters.G2.Tau))
+	fmt.Println("len(phase1.Parameters.G2.Beta)", phase1.Parameters.G2.Beta)
+
 	return phase1, nil
 }
 
@@ -62,8 +68,32 @@ func p2n(cCtx *cli.Context) error {
 	r1cs.ReadFrom(r1csFile)
 
 	fmt.Fprintln(os.Stdout, []any{"\n################# Initializing phase2\n"}...)
+
+	fmt.Println("r1cs.NbConstraints", r1cs.NbConstraints)
+	internal, secret, public := r1cs.GetNbVariables()
+	fmt.Println("internal, secret, public", internal, secret, public)
+
+	fmt.Println("len(phase1.Parameters.G1.Tau)", len(phase1.Parameters.G1.Tau))
+	fmt.Println("len(phase1.Parameters.G1.AlphaTau)", len(phase1.Parameters.G1.AlphaTau))
+	fmt.Println("len(phase1.Parameters.G1.BetaTau)", len(phase1.Parameters.G1.BetaTau))
+	fmt.Println("len(phase1.Parameters.G2.Tau)", len(phase1.Parameters.G2.Tau))
+	fmt.Println("len(phase1.Parameters.G2.Beta)", phase1.Parameters.G2.Beta)
+	fmt.Println()
+
 	phase2, phase2Evaluations := mpcsetup.InitPhase2(r1cs, phase1)
 
+	fmt.Println("len(phase2Evaluations.G1.A)", len(phase2Evaluations.G1.A))
+	fmt.Println("len(phase2Evaluations.G1.B)", len(phase2Evaluations.G1.B))
+	fmt.Println("len(phase2Evaluations.G1.VKK)", len(phase2Evaluations.G1.VKK))
+	fmt.Println("len(phase2Evaluations.G2.B)", len(phase2Evaluations.G2.B))
+	fmt.Println()
+	fmt.Println("phase2.Parameters.G1.Delta", phase2.Parameters.G1.Delta)
+	fmt.Println("phase2.Parameters.G2.Delta", phase2.Parameters.G2.Delta)
+	fmt.Println("len(phase2.Parameters.G1.L)", len(phase2.Parameters.G1.L))
+	fmt.Println("len(phase2.Parameters.G1.Z)", len(phase2.Parameters.G1.Z))
+	fmt.Println()
+	fmt.Println("phase2.PublicKey", phase2.PublicKey)
+	fmt.Println()
 	fmt.Println("\n################# Writing to file: " + phase2Path)
 	phase2File, err := os.Create(phase2Path)
 	if err != nil {
